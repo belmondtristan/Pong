@@ -1,0 +1,20 @@
+:root {
+    --main-color: white;
+    --variable-color: #1688d4;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #111;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+canvas { 
+    background: black;
+    border: 5px solid var(--variable-color)
+}
