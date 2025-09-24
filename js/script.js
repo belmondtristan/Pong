@@ -3,18 +3,11 @@ const ctx = canvas.getContext('2d');
 let x_b = (400-4)/2;
 let y_b = 572;
 
+let x_r = (canvas.width-80)/2;
+let r_speed = 10;
+
 let running = false;
 
-
-let raquette = {
-
-    width: 80,
-    height: 10,
-    x: (canvas.width-raquette.width)/2,
-    y: canvas.height - raquette.height*2,
-    speed: 10
-
-};
 
 const spped_b_default = 2;
 let pongId;
@@ -25,7 +18,7 @@ let bouton_new = document.getElementById('nouvelle-partie');
 
 function draw(){
     ctx.fillStyle = 'white';
-    ctx.fillRect(raquette.x, raquette.y, raquette.width, raquette.height);
+    ctx.fillRect(x_r, 580, 80, 10);
     
     ctx.beginPath();
     ctx.arc(x_b, y_b, 8, 0, 2 * Math.PI);
@@ -41,7 +34,7 @@ function update(){
 function draw_raquette(){
     ctx.clearRect(0,0,canvas.width, canvas.height);
     ctx.fillStyle = 'white';
-    ctx.fillRect(raquette.x,raquette.y,raquette.width,raquette.height);
+    ctx.fillRect(x_r,580, 80 ,10);
 }
 
 function drawBall() {
@@ -68,12 +61,12 @@ document.addEventListener("keydown", (e) => {
     switch (e.key) {
         case "ArrowLeft":
             // Déplacer vers la gauche (en évitant de sortir du canvas)
-            if (raquette.x > 0) raquette.x -= raquette.speed;
+            if (x_r > 0) x_r -= r_speed;
             break;
 
         case "ArrowRight":
             // Déplacer vers la droite (en évitant de dépasser la largeur)
-            if (raquette.x + raquette.width < canvas.width) raquette.x += raquette.speed;
+            if (x_r + 80 < canvas.width) r_x += r_speed;
             break;
 
         default:
@@ -84,12 +77,5 @@ document.addEventListener("keydown", (e) => {
 });
 
 bouton_new.addEventListener('click',() => {
-    clearRect(0,0,canvas.width, canvas.height);
-    ctx.fillStyle = 'white';
-    ctx.fillRect(raquette.x, raquette.y, raquette.width, raquette.height);
-    
-    ctx.beginPath();
-    ctx.arc(x_b, y_b, 8, 0, 2 * Math.PI);
-    ctx.fillStyle = 'red';
-    ctx.fill();
+    draw();
 })
