@@ -28,21 +28,25 @@ let bestScorValue = document.getElementById('best-score-value');
 document.addEventListener("keydown", e => keys[e.key] = true);
 document.addEventListener("keyup", e => keys[e.key] = false);
 
-bouton_d.addEventListener('touchstart', () => {
-    keys["ArrowRight"] = true;
-});
-
-bouton_d.addEventListener('touchend', () => {
-    keys["ArrowRight"] = false;
-});
-
-bouton_g.addEventListener('touchstart', () => {
-    keys["ArrowLeft"] = true;
-});
-
-bouton_g.addEventListener('touchend', () => {
-    keys["ArrowLeft"] = false;
-});
+// Support tactile pour mobile : boutons gauche/droite
+if (bouton_g && bouton_d) {
+    bouton_g.addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        keys['ArrowLeft'] = true;
+    });
+    bouton_g.addEventListener('touchend', function(e) {
+        e.preventDefault();
+        keys['ArrowLeft'] = false;
+    });
+    bouton_d.addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        keys['ArrowRight'] = true;
+    });
+    bouton_d.addEventListener('touchend', function(e) {
+        e.preventDefault();
+        keys['ArrowRight'] = false;
+    });
+}
 
 function draw(){
     ctx.fillStyle = 'white';
