@@ -9,6 +9,7 @@ let x_r = (canvas.width-80)/2;
 let r_speed = 10;
 
 let running = false;
+let starttime;
 
 
 
@@ -18,10 +19,30 @@ let pongId;
 let bouton_g = document.getElementById('fleche-gauche');
 let bouton_d = document.getElementById('fleche-droite');
 let bouton_new = document.getElementById('b_new');
+let score = 0;
+let bestScore = 0;
+let scorValue = document.getElementById('score-value');
+let bestScorValue = document.getElementById('best-score-value');
 
  const keys = {};
 document.addEventListener("keydown", e => keys[e.key] = true);
 document.addEventListener("keyup", e => keys[e.key] = false);
+
+bouton_d.addEventListener('mousedown', () => {
+    keys["ArrowRight"] = true;
+});
+
+bouton_d.addEventListener('mouseup', () => {
+    keys["ArrowRight"] = false;
+});
+
+bouton_g.addEventListener('mousedown', () => {
+    keys["ArrowLeft"] = true;
+});
+
+bouton_g.addEventListener('mouseup', () => {
+    keys["ArrowLeft"] = false;
+});
 
 function draw(){
     ctx.fillStyle = 'white';
@@ -37,11 +58,47 @@ function draw(){
 function update(){
     if(keys["ArrowLeft"] && x_r > 0) x_r -= r_speed;
     if(keys["ArrowRight"] && x_r + 80  < canvas.width) x_r += r_speed;
+    if (b_speed < 8 && b_speed > 0) {
+        b_speed = b_speed + 0.01;
+    }
+    if (b_speed > -8 && b_speed < 0) {
+        b_speed = b_speed - 0.001;
+    }
     moveBall(b_speed, b_angle);
     draw_raquette();
     drawBall();
+    calculScore();
+   
 }
 
+
+
+function calculScore(){
+    if (running) {
+        scoreUpdate();
+    }
+}
+
+function initScore(){
+    score = 0;
+    bestScore = 0;
+    scorValue.textContent = score;
+    bestScorValue.textContent = bestScore;
+}
+
+function resetScore(){
+    score = 0;
+    scorValue.textContent = score;
+}
+
+function scoreUpdate(){
+    score = Math.floor((Date.now() - starttime) / 1000);
+    scorValue.textContent = score;
+    if (score > bestScore) {
+        bestScore = score;
+        bestScorValue.textContent = bestScore;
+    }
+}
 
 function draw_raquette(){
     ctx.clearRect(0,0,canvas.width, canvas.height);
@@ -60,11 +117,22 @@ function moveBall(speed, angle) {
     y_b -= speed;
     x_b += speed * Math.cos(angle);
     if (y_b <= 0) {
-        b_speed = b_speed*(-1);
-        b_angle = (Math.PI - b_angle)*(-1);
+        b_speed = b_speed * (-1);
+        b_angle = (Math.PI - b_angle) * (-1);
+    }
+    // Collision balle/raquette avec marge
+    if (
+        y_b + 8 >= 580 && // bas de la balle touche le haut de la raquette
+        y_b - 8 <= 590 && // haut de la balle ne dépasse pas trop la raquette
+        x_b + 8 >= x_r && // balle touche le côté gauche de la raquette
+        x_b - 8 <= x_r + 80 // balle touche le côté droit de la raquette
+    ) {
+        b_speed = b_speed * (-1); // rebondit vers le haut
+        let hit = (x_b - (x_r + 40)) / 40; // -1 (gauche) à +1 (droite)
+        b_angle = hit * (Math.PI - b_angle); // modifie l'angle selon l'endroit où la balle touche la raquette
     }
     if (y_b >= canvas.height) {
-       stopGame();
+        stopGame();
     }
     if (x_b <= 0 || x_b >= 400) {
         b_angle = Math.PI - b_angle;
@@ -83,20 +151,32 @@ function loop() {
 
 function stopGame() {
     running = false;
-    cancelAnimationFrame(pongId);
+    resetValues();
     draw();
+    cancelAnimationFrame(pongId);
+    alert("Game Over! Ton score: " + score + " seconds.");
 }
 
+function resetValues(){
+    x_b = (400-4)/2;
+    y_b = canvas.height/2;
+    b_speed = speed_b_default;
+    b_angle = Math.random();
+    x_r = (canvas.width-80)/2;
+}
 
 //place tout les elements au centre et lance la boucle du jeu
 function startGame() {
     running = true;
-    x_b = (400-4)/2;
-    y_b = canvas.height/2;
-    x_r = (canvas.width-80)/2;
-    b_angle = Math.random();
-    b_speed = speed_b_default;
-    y_b = canvas.height/2;
+    resetValues();
+    starttime = Date.now();
+    if (bestScore == 0){
+        initScore();
+    }
+    else{
+        resetScore();
+    }
+    
     loop();
 }
 
@@ -123,5 +203,3 @@ function startGame() {
 bouton_new.addEventListener('click',() => {
    startGame();
 })
-
-loop();
