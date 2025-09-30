@@ -1,12 +1,45 @@
+// Fonction pour rendre le canvas net sur tous les écrans
+function resizeCanvasForHiDPI() {
+    // Taille CSS voulue (en pixels affichés)
+    const cssWidth = canvas.clientWidth;
+    const cssHeight = canvas.clientHeight;
+    const dpr = window.devicePixelRatio || 1;
+    // On ajuste la taille interne du canvas
+    canvas.width = Math.round(cssWidth * dpr);
+    canvas.height = Math.round(cssHeight * dpr);
+    // On adapte le contexte pour dessiner à la bonne échelle
+    ctx.setTransform(1, 0, 0, 1, 0, 0); // reset
+    ctx.scale(dpr, dpr);
+}
+
+
 const canvas = document.getElementById('pong');
 const ctx = canvas.getContext('2d');
-let x_b = (400-4)/2;
-let y_b = 572;
+
+// Dimensions de base pour ratios
+const BASE_WIDTH = 300;
+const BASE_HEIGHT = 500;
+const BASE_RACKET_WIDTH = 70;
+const BASE_RACKET_HEIGHT = 10;
+const BASE_BALL_RADIUS = 8;
+
+let x_b = canvas.width / 2;
+let y_b = canvas.height / 2;
 const speed_b_default = 2;
-let b_angle; // angle entre 45 et 135 degrés
+let b_angle;
 let b_speed = speed_b_default;
-let x_r = (canvas.width-80)/2;
+let x_r = (canvas.width - getRacketWidth()) / 2;
 let r_speed = 10;
+
+function getRacketWidth() {
+    return canvas.width * (BASE_RACKET_WIDTH / BASE_WIDTH);
+}
+function getRacketHeight() {
+    return canvas.height * (BASE_RACKET_HEIGHT / BASE_HEIGHT);
+}
+function getBallRadius() {
+    return canvas.width * (BASE_BALL_RADIUS / BASE_WIDTH);
+}
 
 let running = false;
 let starttime;
@@ -48,20 +81,26 @@ if (bouton_g && bouton_d) {
     });
 }
 
+// Redimensionne le canvas à chaque resize pour éviter le flou
+function handleResize() {
+    resizeCanvasForHiDPI();
+    draw();
+}
+window.addEventListener('resize', handleResize);
+window.addEventListener('DOMContentLoaded', handleResize);
+
 function draw(){
-    ctx.fillStyle = 'white';
-    ctx.fillRect(x_r, canvas.height, 70, 10);
-    
-    ctx.beginPath();
-    ctx.arc(x_b, y_b, 8, 0, 2 * Math.PI);
-    ctx.fillStyle = 'red';
-    ctx.fill();
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    draw_raquette();
+    drawBall();
 }
 
 
 function update(){
+    ctx.clearRect(0,0,canvas.width, canvas.height);
+    let racketW = getRacketWidth();
     if(keys["ArrowLeft"] && x_r > 0) x_r -= r_speed;
-    if(keys["ArrowRight"] && x_r + 70  < canvas.width) x_r += r_speed;
+    if(keys["ArrowRight"] && x_r + racketW < canvas.width) x_r += r_speed;
     if (b_speed < 8 && b_speed > 0) {
         b_speed = b_speed + 0.01;
     }
@@ -72,7 +111,6 @@ function update(){
     draw_raquette();
     drawBall();
     calculScore();
-   
 }
 
 
@@ -105,40 +143,53 @@ function scoreUpdate(){
 }
 
 function draw_raquette(){
-    ctx.clearRect(0,0,canvas.width, canvas.height);
     ctx.fillStyle = 'white';
-    ctx.fillRect(x_r,canvas.height - 20 , 70 ,10);
+    ctx.fillRect(x_r, canvas.height - getRacketHeight() - 5, getRacketWidth(), getRacketHeight());
 }
 
 function drawBall() {
     ctx.fillStyle = 'red';
     ctx.beginPath();
-    ctx.arc(x_b, y_b, 8, 0, Math.PI * 2);
+    ctx.arc(x_b, y_b, getBallRadius(), 0, Math.PI * 2);
     ctx.fill();
 }
 
 function moveBall(speed, angle) {
+    let ballR = getBallRadius();
+    let racketW = getRacketWidth();
+    let racketH = getRacketHeight();
     y_b -= speed;
     x_b += speed * Math.cos(angle);
-    if (y_b <= 0) {
+    if (y_b - ballR <= 0) {
         b_speed = b_speed * (-1);
         b_angle = (Math.PI - b_angle) * (-1);
     }
-    // Collision balle/raquette avec marge
+    // Collision balle/raquette améliorée (empêche la balle de rentrer sur les côtés)
+    let racketTop = canvas.height - racketH - 5;
+    let racketBottom = canvas.height - 5;
+    let racketLeft = x_r;
+    let racketRight = x_r + racketW;
+    let ballBottom = y_b + ballR;
+    let ballTop = y_b - ballR;
+    let ballLeft = x_b - ballR;
+    let ballRight = x_b + ballR;
     if (
-        y_b + 8 >= canvas.height - 20 && // bas de la balle touche le haut de la raquette
-        y_b - 8 <= canvas.height - 10 && // haut de la balle ne dépasse pas trop la raquette
-        x_b + 8 >= x_r && // balle touche le côté gauche de la raquette
-        x_b - 8 <= x_r + 80 // balle touche le côté droit de la raquette
+        ballBottom >= racketTop &&
+        ballTop <= racketBottom &&
+        ballRight >= racketLeft &&
+        ballLeft <= racketRight
     ) {
+         
+        // Replace la balle juste au-dessus de la raquette pour éviter de "rentrer" dedans
+        y_b = racketTop - ballR;
         b_speed = b_speed * (-1); // rebondit vers le haut
-        let hit = (x_b - (x_r + 35)) / 35; // -1 (gauche) à +1 (droite)
+        let hit = (x_b - (x_r + racketW / 2)) / (racketW / 2); // -1 (gauche) à +1 (droite)
         b_angle = hit * (Math.PI - b_angle); // modifie l'angle selon l'endroit où la balle touche la raquette
     }
-    if (y_b >= canvas.height) {
+    if (y_b - ballR > canvas.height) {
         stopGame();
     }
-    if (x_b <= 0 || x_b >= canvas.width) {
+    if (x_b - ballR <= 0 || x_b + ballR >= canvas.width) {
         b_angle = Math.PI - b_angle;
     }
 }
@@ -163,11 +214,11 @@ function stopGame() {
 }
 
 function resetValues(){
-    x_b = (canvas.width-4)/2;
-    y_b = canvas.height/2;
+    x_b = canvas.width / 2;
+    y_b = canvas.height / 2;
     b_speed = speed_b_default;
     b_angle = Math.random();
-    x_r = (canvas.width-80)/2;
+    x_r = (canvas.width - getRacketWidth()) / 2;
 }
 
 //place tout les elements au centre et lance la boucle du jeu

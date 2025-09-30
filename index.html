@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" href="favicon/table-tennis-paddle-ball-duotone-solid-full.svg"content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="favicon/table-tennis-paddle-ball-duotone-solid-full.svg">
     <title>Solo Pong</title>
     <script src="./js/script.js" defer></script>
     <link rel="stylesheet" href="./css/style.css">
@@ -11,30 +11,26 @@
 <body>
     <h1>Solo Pong</h1>
     <p> Joue le plus longtemps possible !</p>
-    <div id ="zone-de-jeux">
-        <canvas id="pong" width ="300" height = "500"
-            aria-label = "Jeu Pong en solo. Deplacez la raquette avec les fleche gauche/droite ou les boutons tactiles pour renvoyez la balle">
+    <div id="zone-de-jeux">
+        <canvas id="pong"
+            aria-label="Jeu Pong en solo. Déplacez la raquette avec les flèches gauche/droite ou les boutons tactiles pour renvoyer la balle">
             Votre navigateur ne prend pas en charge Canvas.
         </canvas>
-        <div id = "new-game">
-
-            <button id = "b_new"> Nouvelle Partie</button>
-
+        <div id="new-game">
+            <button id="b_new">Nouvelle Partie</button>
         </div>
-
-        <div id = "score">
-
-            <p>Score : <span id = "score-value">0</span></p>
-            <p>Meilleur Score : <span id = "best-score-value">0</span></p>
+        <div id="score">
+            <p>Score : <span id="score-value">0</span></p>
+            <p>Meilleur Score : <span id="best-score-value">0</span></p>
         </div>
-
-        <div id = "arrow">
-
-            <button id = "fleche-gauche"><img src="./favicon/arrow-left-solid-full.svg" height="50" width="48"></button>
-            <button id = "fleche-droite"><img src="./favicon/arrow-right-solid-full.svg" height="50" width="48"></button>
-
+        <div id="arrow">
+            <button id="fleche-gauche" aria-label="Déplacer la raquette à gauche">
+                <img src="./favicon/arrow-left-solid-full.svg" alt="Gauche" style="width:100%;max-width:48px;height:auto;">
+            </button>
+            <button id="fleche-droite" aria-label="Déplacer la raquette à droite">
+                <img src="./favicon/arrow-right-solid-full.svg" alt="Droite" style="width:100%;max-width:48px;height:auto;">
+            </button>
         </div>
-
     </div>
     
 </body>
