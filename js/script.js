@@ -50,7 +50,7 @@ if (bouton_g && bouton_d) {
 
 function draw(){
     ctx.fillStyle = 'white';
-    ctx.fillRect(x_r, 580, 80, 10);
+    ctx.fillRect(x_r, canvas.height, 70, 10);
     
     ctx.beginPath();
     ctx.arc(x_b, y_b, 8, 0, 2 * Math.PI);
@@ -61,7 +61,7 @@ function draw(){
 
 function update(){
     if(keys["ArrowLeft"] && x_r > 0) x_r -= r_speed;
-    if(keys["ArrowRight"] && x_r + 80  < canvas.width) x_r += r_speed;
+    if(keys["ArrowRight"] && x_r + 70  < canvas.width) x_r += r_speed;
     if (b_speed < 8 && b_speed > 0) {
         b_speed = b_speed + 0.01;
     }
@@ -107,7 +107,7 @@ function scoreUpdate(){
 function draw_raquette(){
     ctx.clearRect(0,0,canvas.width, canvas.height);
     ctx.fillStyle = 'white';
-    ctx.fillRect(x_r,580, 80 ,10);
+    ctx.fillRect(x_r,canvas.height - 20 , 70 ,10);
 }
 
 function drawBall() {
@@ -126,19 +126,19 @@ function moveBall(speed, angle) {
     }
     // Collision balle/raquette avec marge
     if (
-        y_b + 8 >= 580 && // bas de la balle touche le haut de la raquette
-        y_b - 8 <= 590 && // haut de la balle ne dépasse pas trop la raquette
+        y_b + 8 >= canvas.height - 20 && // bas de la balle touche le haut de la raquette
+        y_b - 8 <= canvas.height - 10 && // haut de la balle ne dépasse pas trop la raquette
         x_b + 8 >= x_r && // balle touche le côté gauche de la raquette
         x_b - 8 <= x_r + 80 // balle touche le côté droit de la raquette
     ) {
         b_speed = b_speed * (-1); // rebondit vers le haut
-        let hit = (x_b - (x_r + 40)) / 40; // -1 (gauche) à +1 (droite)
+        let hit = (x_b - (x_r + 35)) / 35; // -1 (gauche) à +1 (droite)
         b_angle = hit * (Math.PI - b_angle); // modifie l'angle selon l'endroit où la balle touche la raquette
     }
     if (y_b >= canvas.height) {
         stopGame();
     }
-    if (x_b <= 0 || x_b >= 400) {
+    if (x_b <= 0 || x_b >= canvas.width) {
         b_angle = Math.PI - b_angle;
     }
 }
@@ -156,13 +156,14 @@ function loop() {
 function stopGame() {
     running = false;
     resetValues();
+    alert("Game Over! Ton score: " + score + " seconds.");
     draw();
     cancelAnimationFrame(pongId);
-    alert("Game Over! Ton score: " + score + " seconds.");
+    
 }
 
 function resetValues(){
-    x_b = (400-4)/2;
+    x_b = (canvas.width-4)/2;
     y_b = canvas.height/2;
     b_speed = speed_b_default;
     b_angle = Math.random();
