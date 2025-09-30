@@ -28,19 +28,19 @@ let bestScorValue = document.getElementById('best-score-value');
 document.addEventListener("keydown", e => keys[e.key] = true);
 document.addEventListener("keyup", e => keys[e.key] = false);
 
-bouton_d.addEventListener('mousedown', () => {
+bouton_d.addEventListener('touchstart', () => {
     keys["ArrowRight"] = true;
 });
 
-bouton_d.addEventListener('mouseup', () => {
+bouton_d.addEventListener('touchend', () => {
     keys["ArrowRight"] = false;
 });
 
-bouton_g.addEventListener('mousedown', () => {
+bouton_g.addEventListener('touchstart', () => {
     keys["ArrowLeft"] = true;
 });
 
-bouton_g.addEventListener('mouseup', () => {
+bouton_g.addEventListener('touchend', () => {
     keys["ArrowLeft"] = false;
 });
 
