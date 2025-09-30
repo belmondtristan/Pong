@@ -1,14 +1,26 @@
-// Fonction pour rendre le canvas net sur tous les écrans
-function resizeCanvasForHiDPI() {
-    // Taille CSS voulue (en pixels affichés)
-    const cssWidth = canvas.clientWidth;
-    const cssHeight = canvas.clientHeight;
+
+// Fonction pour rendre le canvas responsive et net sur tous les écrans
+function resizeCanvasResponsive() {
+    // Largeur max = 98vw, hauteur max = 70vh (pour mobile)
+    let parent = canvas.parentElement;
+    let maxW = Math.min(window.innerWidth * 0.98, 400);
+    let maxH = Math.min(window.innerHeight * 0.7, 700);
+    // Respecte le ratio 3/5
+    let ratio = BASE_WIDTH / BASE_HEIGHT;
+    let width = maxW;
+    let height = width / ratio;
+    if (height > maxH) {
+        height = maxH;
+        width = height * ratio;
+    }
+    // Applique la taille CSS
+    canvas.style.width = width + 'px';
+    canvas.style.height = height + 'px';
+    // Applique la taille interne pour HiDPI
     const dpr = window.devicePixelRatio || 1;
-    // On ajuste la taille interne du canvas
-    canvas.width = Math.round(cssWidth * dpr);
-    canvas.height = Math.round(cssHeight * dpr);
-    // On adapte le contexte pour dessiner à la bonne échelle
-    ctx.setTransform(1, 0, 0, 1, 0, 0); // reset
+    canvas.width = Math.round(width * dpr);
+    canvas.height = Math.round(height * dpr);
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.scale(dpr, dpr);
 }
 
@@ -81,9 +93,14 @@ if (bouton_g && bouton_d) {
     });
 }
 
-// Redimensionne le canvas à chaque resize pour éviter le flou
+
+// Redimensionne le canvas à chaque resize pour responsivité ET netteté
 function handleResize() {
-    resizeCanvasForHiDPI();
+    resizeCanvasResponsive();
+    // Repositionne la raquette et la balle proportionnellement
+    x_r = (canvas.width - getRacketWidth()) / 2;
+    x_b = canvas.width / 2;
+    y_b = canvas.height / 2;
     draw();
 }
 window.addEventListener('resize', handleResize);
