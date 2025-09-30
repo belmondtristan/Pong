@@ -1,5 +1,4 @@
 body {
-   
     margin: 0;
     font-family: Arial, sans-serif;
     background: #111;
@@ -8,15 +7,72 @@ body {
     flex-direction: column;
     align-items: center;
     text-align: center;
+    min-height: 100vh;
 }
 
-canvas{
-   background: black;
-   border: 5px solid chartreuse;
-   border-radius: 5px;
+#zone-de-jeux {
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
 }
 
-
-button{
+canvas {
+    background: black;
+    border: 5px solid chartreuse;
     border-radius: 5px;
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+    aspect-ratio: 3/5;
+    box-sizing: border-box;
+}
+
+button {
+    border-radius: 5px;
+    padding: 0.5em 1.2em;
+    font-size: 1.1em;
+    background: #222;
+    color: #fff;
+    border: 2px solid chartreuse;
+    margin: 0.2em;
+    transition: background 0.2s, color 0.2s;
+}
+button:active, button:focus {
+    background: chartreuse;
+    color: #111;
+    outline: none;
+}
+
+#arrow {
+    display: flex;
+    justify-content: center;
+    gap: 1em;
+}
+
+#arrow button img {
+    width: 40px;
+    height: 40px;
+}
+
+@media (max-width: 600px) {
+    #zone-de-jeux {
+        max-width: 98vw;
+    }
+    canvas {
+        border-width: 3px;
+    }
+    h1 {
+        font-size: 1.5em;
+    }
+    #arrow button img {
+        width: 32px;
+        height: 32px;
+    }
+    button {
+        font-size: 1em;
+        padding: 0.4em 0.8em;
+    }
 }
